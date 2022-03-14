@@ -2,12 +2,12 @@
 
 
 #include <Adafruit_SSD1306.h>
-#include <splash.h>
 #define SCREEN_WIDTH 128 // OLED width, pixel size
 #define SCREEN_HEIGHT 32 // OLED height, pixel size
 #define OLED_RESET -1 // Resetpin#(or -1 When connecting the aduino to the resetpin.)
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
+
 /*
    Backwards
   LOW, HIGH
@@ -44,7 +44,7 @@ void setup() {
   pinMode(sensor1, INPUT);
   pinMode(sensor2, INPUT);
 
-  Serial.begin(9600); // Enable serial monitor for debugging message output
+  Serial.begin(115200); // Enable serial monitor for debugging message output
   // SSD1306_SWITCHCAPVCC = Leave the inner 3.3v charge pump circuit on.
   // OLED Specify address 0x3c
 
@@ -54,14 +54,38 @@ void setup() {
   }
 }
 
+void fwd() {
+  analogWrite(fwd1, 200);
+  analogWrite(rev1, 0);
+  analogWrite(fwd2, 220);
+  analogWrite(rev2, 0);
+}
+
+void rev() {
+  analogWrite(fwd1, 0);
+  analogWrite(rev1, 200);
+  analogWrite(fwd2, 0);
+  analogWrite(rev2, 220);
+}
+
+void left() {
+  analogWrite(fwd1, 200);
+  analogWrite(rev1, 0);
+  analogWrite(fwd2, 0);
+  analogWrite(rev2, 0);
+}
+
+void right() {
+  analogWrite(fwd1, 200);
+  analogWrite(rev1, 0);
+  analogWrite(fwd2, 220);
+  analogWrite(rev2, 0);
+}
+
 void loop() {
   // put your main code here, to run repeatedly:
-  digitalWrite(fwd1, HIGH);
-  digitalWrite(rev1, LOW);
-  digitalWrite(fwd2, HIGH);
-  digitalWrite(rev2, LOW);
-  sensor1val = analogRead(sensor1);
-  sensor2val = analogRead(sensor2);
-  Serial.println(sensor1val);
+  //sensor1val = analogRead(sensor1);
+  //sensor2val = analogRead(sensor2);
+  //Serial.println(sensor1val);
 
 }
