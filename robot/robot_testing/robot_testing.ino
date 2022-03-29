@@ -1,5 +1,5 @@
 #include <Adafruit_VL53L0X.h>
-
+#include <analogWrite.h>
 
 #include <Adafruit_SSD1306.h>
 #define SCREEN_WIDTH 128 // OLED width, pixel size
@@ -76,7 +76,7 @@ void left() {
 }
 
 void right() {
-  analogWrite(fwd1, 200);
+  analogWrite(fwd1, 0);
   analogWrite(rev1, 0);
   analogWrite(fwd2, 220);
   analogWrite(rev2, 0);
