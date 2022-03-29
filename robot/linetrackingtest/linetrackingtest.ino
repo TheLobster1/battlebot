@@ -221,6 +221,9 @@ void loop() {
   if (currentState == "race") {
     race();
   }
+  if (currentState == "maze") {
+    maze();
+  }
   WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) {                             // if you get a client,
@@ -274,6 +277,9 @@ void loop() {
         }
         if (currentLine.endsWith("GET /7")) {
           currentState = "race";
+        }
+        if (currentLine.endsWith("GET /8")) {
+          currentState = "maze";
         }
       }
     }
