@@ -73,20 +73,20 @@ void lineFollowState() {
 void followLine() {
   lineFollowState();
   if (sensor1val <= 400 && sensor2val <= 400) {
-    speed1 = 140;
-    speed2 = 140;
+    speed1 = 130;
+    speed2 = 130;
 //    robot.rotate(1, 50, 2);
 //    robot.rotate(2, 50, 2);
     state = 1; 
   } 
   else if (sensor1val >= 300 && sensor2val <= 300) {
-    speed1 = 160;
-    speed2 = 160;
+    speed1 = 170;
+    speed2 = 170;
     state = 2;
   }
   else if (sensor1val <=300 && sensor2val >=300) {
-    speed1 = 160;
-    speed2 = 160;
+    speed1 = 170;
+    speed2 = 170;
     state = 3;
   }
   else {
@@ -109,6 +109,10 @@ void followLine() {
 void race() {
   
 //  distance = 
+
+//speedboost setup
+  sensor1val = analogRead(sensor1);
+  sensor2val = analogRead(sensor2);
   
 //  if (distance >= 300) {
   if (sensor1val >= 400 && sensor2val >= 400) {
@@ -116,7 +120,7 @@ void race() {
     speed2 = 250;
     delay(5000);
   }
-  elseif (sensor1val <= 400 && sensor2val <= 400) {
+  else if (sensor1val <= 400 && sensor2val <= 400) {
     speed1 = 200;
     speed2 = 200;
   }
