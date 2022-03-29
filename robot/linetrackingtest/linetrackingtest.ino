@@ -111,6 +111,16 @@ void race() {
 //  distance = 
   
 //  if (distance >= 300) {
+  if (sensor1val >= 400 && sensor2val >= 400) {
+    speed1 = 250;
+    speed2 = 250;
+    delay(5000);
+  }
+  elseif (sensor1val <= 400 && sensor2val <= 400) {
+    speed1 = 200;
+    speed2 = 200;
+  }
+  
   speed1 = 200;
   speed2 = 200;
   fwd();
@@ -120,6 +130,15 @@ void race() {
 //  analogWrite(fwd2, 0);
 //  analogWrite(rev2, 0);
 //  }
+}
+
+void maze() {
+  speed1 = 170;
+  speed2 = 170;
+  if (sensor1val <= 400 && sensor2val <= 400) {
+    
+  }
+  
 }
 
 void setup() {
@@ -201,15 +220,23 @@ void right() {
 
 void loop() {
     if (currentState == "fwd") {
+    speed1 = 180;
+    speed2 = 180;
     fwd();
   }
   if (currentState == "rev") {
+    speed1 = 180;
+    speed2 = 180;
     rev();
   }
   if (currentState == "left") {
+    speed1 = 180;
+    speed2 = 180;
     left();
   }
   if (currentState == "right") {
+    speed1 = 180;
+    speed2 = 180;
     right();
   }
   if (currentState == "followLine") {
