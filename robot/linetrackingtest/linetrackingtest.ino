@@ -1,8 +1,10 @@
+#include <HCSR04.h>
 #include <WiFi.h>
 #include <Adafruit_VL53L0X.h>
 #include <analogWrite.h>
 #include <Wire.h>
 #include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
 #include <HTTPClient.h>
 
 #define SCREEN_WIDTH 128 // OLED width, pixel size
@@ -15,7 +17,8 @@ const char* ssid     = "yesman";
 const char* password = "abcdefghijk";
 String website = "battlebot3.server.nl";
 WiFiServer server(80);
-
+UltraSonicDistanceSensor distanceSensor(14, 12);
+Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 /*
    Backwards
   LOW, HIGH
@@ -80,13 +83,13 @@ void followLine() {
     state = 1; 
   } 
   else if (sensor1val >= 300 && sensor2val <= 300) {
-    speed1 = 170;
-    speed2 = 170;
+    speed1 = 160;
+    speed2 = 160;
     state = 2;
   }
   else if (sensor1val <=300 && sensor2val >=300) {
-    speed1 = 170;
-    speed2 = 170;
+    speed1 = 160;
+    speed2 = 160;
     state = 3;
   }
   else {
@@ -140,7 +143,7 @@ void maze() {
   speed1 = 170;
   speed2 = 170;
   if (sensor1val <= 400 && sensor2val <= 400) {
-    
+    fwd();
   }
   
 }
@@ -154,6 +157,12 @@ void setup() {
   // Infrared
   pinMode(sensor1, INPUT);
   pinMode(sensor2, INPUT);
+
+  //front distance sensor
+  if (!lox.begin()) {
+    Serial.println(F("Failed to boot"));
+    while(1);
+  }
 
   Serial.begin(115200); // Enable serial monitor for debugging message output
   // SSD1306_SWITCHCAPVCC = Leave the inner 3.3v charge pump circuit on.
@@ -223,6 +232,13 @@ void right() {
 }
 
 void loop() {
+   VL53L0X_RangingMeasurementData_t measure;
+   lox.rangingTest(&measure, false);
+   int distance = measure.RangeMilliMeter;
+   if (distance < 200 && (currentState != "followLine" || currentState != "maze" || currentState != "rev")) {
+      Stop();
+   }
+   else {
     if (currentState == "fwd") {
     speed1 = 180;
     speed2 = 180;
@@ -255,6 +271,8 @@ void loop() {
   if (currentState == "maze") {
     maze();
   }
+   }
+   
   WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) {                             // if you get a client,
