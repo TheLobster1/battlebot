@@ -6,18 +6,21 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 #include <HTTPClient.h>
-
 #define SCREEN_WIDTH 128 // OLED width, pixel size
 #define SCREEN_HEIGHT 32 // OLED height, pixel size
 #define OLED_RESET -1 // Resetpin#(or -1 When connecting the aduino to the resetpin.)
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
 // wifi setup
-const char* ssid     = "yesman";
-const char* password = "abcdefghijk";
-String website = "battlebot3.server.nl";
+const char* ssid     = "BattleBot";
+const char* password = "43638253";
+
+//String website = "battlebot3.server.nl";
+
 WiFiServer server(80);
-UltraSonicDistanceSensor distanceSensor(14, 12);
+UltraSonicDistanceSensor distanceSensorLeft(14, 12);
+UltraSonicDistanceSensor distanceSensorRight(33, 25);
+
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 /*
    Backwards
@@ -54,43 +57,51 @@ int speed2 = 0;
 
 String currentState = "Stop";
 
-int state = 0;
-void lineFollowState() {
-  switch (state) {
-    case 1:
-      rev();
-      break;
-    case 2:
-      left();
-//      delay(200);
-      break;
-    case 3:
-      right();
-//      delay(200);
-      break;
-    default:
-      Stop();
-  }
-}
+//int state = 0;
+//void lineFollowState() {
+//  switch (state) {
+//    case 1:
+//      rev();
+//      break;
+//    case 2:
+//      left();
+////      delay(200);
+//      break;
+//    case 3:
+//      right();
+////      delay(200);
+//      break;
+//    default:
+//      Stop();
+//  }
+//}
+
 
 void followLine() {
-  lineFollowState();
+//  lineFollowState();
+
   if (sensor1val <= 400 && sensor2val <= 400) {
-    speed1 = 130;
-    speed2 = 130;
-//    robot.rotate(1, 50, 2);
-//    robot.rotate(2, 50, 2);
-    state = 1; 
+    speed1 = 125;
+    speed2 = 125;
+    rev(); 
   } 
   else if (sensor1val >= 300 && sensor2val <= 300) {
-    speed1 = 160;
-    speed2 = 160;
-    state = 2;
+    speed1 = 180;
+    speed2 = 180;
+    Stop();
+//    state = 2;
+delay(75);
+      left();  
+    delay(100);
   }
   else if (sensor1val <=300 && sensor2val >=300) {
-    speed1 = 160;
-    speed2 = 160;
-    state = 3;
+    speed1 = 180;
+    speed2 = 180;
+    Stop();
+    delay(75);
+//    state = 3;
+    right();
+    delay(100);
   }
   else {
     state = 0;
@@ -99,8 +110,6 @@ void followLine() {
   display.setTextColor(SSD1306_WHITE);
   display.clearDisplay();
   // put your main code here, to run repeatedly:
-  sensor1val = analogRead(sensor1);
-  sensor2val = analogRead(sensor2);
   display.setCursor(0,0);
   display.print("IR left: "); display.print(sensor1val);
   display.print(" IR right: "); display.print(sensor2val);
@@ -109,15 +118,15 @@ void followLine() {
   display.display();
 }
 
-void race() {
+void race(int distance) {
   
 //  distance = 
-
+   
 //speedboost setup
   sensor1val = analogRead(sensor1);
   sensor2val = analogRead(sensor2);
   
-//  if (distance >= 300) {
+  if (distance >= 300) {
   if (sensor1val >= 400 && sensor2val >= 400) {
     speed1 = 250;
     speed2 = 250;
@@ -131,21 +140,52 @@ void race() {
   speed1 = 200;
   speed2 = 200;
   fwd();
-//  } else {
-//  analogWrite(fwd1, 0);
-//  analogWrite(rev1, 0);
-//  analogWrite(fwd2, 0);
-//  analogWrite(rev2, 0);
-//  }
+  } else {
+  Stop();
+  }
 }
 
-void maze() {
-  speed1 = 170;
-  speed2 = 170;
-  if (sensor1val <= 400 && sensor2val <= 400) {
+void maze(int distance) {
+    speed1 = 180;
+  speed2 = 180;
+  int ultraDistanceLeft = distanceSensorLeft.measureDistanceCm();
+  int ultraDistanceRight = distanceSensorRight.measureDistanceCm();
+
+  
+  if (distance >= 200) {
     fwd();
+  } else {
+        speed1 = 200;
+       speed2 = 200;
+       
+       if (ultraDistanceRight >= 5 && ultraDistanceLeft >= 5) {
+      rev();
+      delay(200);
+    }else if (ultraDistanceRight >= 5) {
+        Stop();
+        delay(50);
+        left();
+        delay(800);
+    } else if(ultraDistanceLeft >= 5) {
+        Stop();
+        delay(50);
+        right();
+        delay(800);
+    } 
   }
   
+  
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.clearDisplay();
+  // put your main code here, to run repeatedly:
+  
+
+  display.setCursor(0,0);
+  display.print(distance);
+  display.display();
+  display.clearDisplay();
+  display.display();
 }
 
 void setup() {
@@ -232,13 +272,13 @@ void right() {
 }
 
 void loop() {
+  sensor1val = analogRead(sensor1);
+  sensor2val = analogRead(sensor2);
    VL53L0X_RangingMeasurementData_t measure;
    lox.rangingTest(&measure, false);
    int distance = measure.RangeMilliMeter;
-   if (distance < 200 && (currentState != "followLine" || currentState != "maze" || currentState != "rev")) {
-      Stop();
-   }
-   else {
+
+   
     if (currentState == "fwd") {
     speed1 = 180;
     speed2 = 180;
@@ -266,12 +306,12 @@ void loop() {
     Stop();
   }
   if (currentState == "race") {
-    race();
+    race(distance);
   }
   if (currentState == "maze") {
-    maze();
+    maze(distance);
   }
-   }
+
    
   WiFiClient client = server.available();   // listen for incoming clients
 
