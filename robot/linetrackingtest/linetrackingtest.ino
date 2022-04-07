@@ -83,28 +83,26 @@ void followLine() {
   if (sensor1val <= 400 && sensor2val <= 400) {
     speed1 = 125;
     speed2 = 125;
-    rev(); 
+    rev();    //forward
   } 
-  else if (sensor1val >= 300 && sensor2val <= 300) {
+  else if (sensor1val >= 400 && sensor2val <= 400) {
     speed1 = 180;
     speed2 = 180;
     Stop();
-//    state = 2;
-delay(75);
-      left();  
-    delay(100);
+//delay(30);
+    left();  
+//    delay(125);
   }
-  else if (sensor1val <=300 && sensor2val >=300) {
+  else if (sensor1val <=400 && sensor2val >= 400) {
     speed1 = 180;
     speed2 = 180;
     Stop();
-    delay(75);
-//    state = 3;
+    //delay(30);
     right();
-    delay(100);
+//    delay(125);
   }
   else {
-    state = 0;
+    fwd();  //reverse
   }
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
@@ -127,18 +125,17 @@ void race(int distance) {
   sensor2val = analogRead(sensor2);
   
   if (distance >= 300) {
-  if (sensor1val >= 400 && sensor2val >= 400) {
-    speed1 = 250;
-    speed2 = 250;
-    delay(5000);
-  }
-  else if (sensor1val <= 400 && sensor2val <= 400) {
-    speed1 = 200;
-    speed2 = 200;
-  }
+//  if (sensor1val >= 400 && sensor2val >= 400) {
+//    speed1 = 250;
+//    speed2 = 250;
+//  }
+//  else if (sensor1val <= 400 && sensor2val <= 400) {
+//    speed1 = 200;
+//    speed2 = 200;
+//  }
   
-  speed1 = 200;
-  speed2 = 200;
+  speed1 = 400;
+  speed2 = 400;
   fwd();
   } else {
   Stop();
@@ -182,7 +179,8 @@ void maze(int distance) {
   
 
   display.setCursor(0,0);
-  display.print(distance);
+  display.println(ultraDistanceRight);
+  display.println(ultraDistanceLeft);
   display.display();
   display.clearDisplay();
   display.display();
@@ -346,28 +344,28 @@ void loop() {
         }
 
         // Check to see if the client request was "GET /H" or "GET /L":
-        if (currentLine.endsWith("GET /1")) {
+        if (currentLine.endsWith("GET /Forward")) {
           currentState = "fwd";
         }
-        if (currentLine.endsWith("GET /2")) {
+        if (currentLine.endsWith("GET /Back")) {
           currentState = "rev";
         }
-        if (currentLine.endsWith("GET /3")) {
+        if (currentLine.endsWith("GET /TurnLeft")) {
           currentState = "left";
         }
-        if (currentLine.endsWith("GET /4")) {
+        if (currentLine.endsWith("GET /TurnRight")) {
           currentState = "right";
         }
-        if (currentLine.endsWith("GET /5")) {
+        if (currentLine.endsWith("GET /LineTrack")) {
           currentState = "followLine";
         }
-        if (currentLine.endsWith("GET /6")) {
+        if (currentLine.endsWith("GET /Stop")) {
           currentState = "Stop";
         }
-        if (currentLine.endsWith("GET /7")) {
+        if (currentLine.endsWith("GET /Race")) {
           currentState = "race";
         }
-        if (currentLine.endsWith("GET /8")) {
+        if (currentLine.endsWith("GET /Maze")) {
           currentState = "maze";
         }
       }

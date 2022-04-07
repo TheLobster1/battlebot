@@ -8,7 +8,7 @@
 </head>
 <body>
     <?php
-    $ip = "192.168.137.16";
+    $ip = "192.168.137.100";
     if($_SERVER['REQUEST_METHOD'] == "POST") {
         if(isset($_POST['fwd'])) {
             $request = "1";
