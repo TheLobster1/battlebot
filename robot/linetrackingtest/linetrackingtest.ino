@@ -19,7 +19,6 @@ const char* password = "43638253";
 
 WiFiServer server(80);
 UltraSonicDistanceSensor distanceSensorLeft(14, 12);
-UltraSonicDistanceSensor distanceSensorRight(33, 25);
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 /*
@@ -81,25 +80,25 @@ void followLine() {
 //  lineFollowState();
 
   if (sensor1val <= 400 && sensor2val <= 400) {
-    speed1 = 125;
-    speed2 = 125;
+    speed1 = 120;
+    speed2 = 120;
     rev();    //forward
   } 
   else if (sensor1val >= 400 && sensor2val <= 400) {
     speed1 = 180;
     speed2 = 180;
     Stop();
-//delay(30);
+    delay(30);
     left();  
-//    delay(125);
+    delay(50);
   }
-  else if (sensor1val <=400 && sensor2val >= 400) {
+  else if (sensor1val <= 400 && sensor2val >= 400) {
     speed1 = 180;
     speed2 = 180;
     Stop();
-    //delay(30);
+    delay(30);
     right();
-//    delay(125);
+    delay(50);
   }
   else {
     fwd();  //reverse
@@ -117,58 +116,89 @@ void followLine() {
 }
 
 void race(int distance) {
-  
-//  distance = 
+  int ultraDistanceLeft = distanceSensorLeft.measureDistanceCm();
    
 //speedboost setup
   sensor1val = analogRead(sensor1);
   sensor2val = analogRead(sensor2);
-  
-  if (distance >= 300) {
-//  if (sensor1val >= 400 && sensor2val >= 400) {
-//    speed1 = 250;
-//    speed2 = 250;
-//  }
-//  else if (sensor1val <= 400 && sensor2val <= 400) {
-//    speed1 = 200;
-//    speed2 = 200;
-//  }
-  
-  speed1 = 400;
-  speed2 = 400;
-  fwd();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.clearDisplay();
+  // put your main code here, to run repeatedly:
+  display.setCursor(0,0);
+  display.print(" Distance Left: "); display.print(ultraDistanceLeft);
+  display.display();
+  display.clearDisplay();
+  display.display();
+  speed1 = 200;
+  speed2 = 200;
+  if (distance >= 200) {
+//    if(sensor1val >=  400) {
+//      int speedRandom = random(2);
+//      if(speedRandom == 1) {
+//        speed1 = 250;
+//        speed2 = 250;
+//      }
+//      else if(speedRandom == 0) {
+//        speed1 = 170;
+//        speed2 = 170;
+//      }
+//    }
+     if (ultraDistanceLeft >= 20) {
+      speed1 = 150;
+      speed2 = 150;
+      left();
+      
+    }
+    else if (ultraDistanceLeft <= 10 && ultraDistanceLeft != -1) 
+    {
+      speed1 = 150;
+      speed2 = 150;
+      right();
+    }
+    else {
+      fwd();
+    }
   } else {
-  Stop();
+      if (ultraDistanceLeft >= 15) {
+      speed1 = 150;
+      speed2 = 200;
+      delay(150);
+    }
+    else if (ultraDistanceLeft < 15 && ultraDistanceLeft != -1) 
+    {
+      speed1 = 200;
+      speed2 = 150;
+    }
+    else {
+      speed1 = 200;
+      speed2 = 200;
+    }
+    rev();
   }
 }
 
 void maze(int distance) {
-    speed1 = 180;
+  speed1 = 180;
   speed2 = 180;
   int ultraDistanceLeft = distanceSensorLeft.measureDistanceCm();
-  int ultraDistanceRight = distanceSensorRight.measureDistanceCm();
 
   
   if (distance >= 200) {
     fwd();
-  } else {
-        speed1 = 200;
+  } 
+  else {    //omg wall
+       speed1 = 200;
        speed2 = 200;
-       
-       if (ultraDistanceRight >= 5 && ultraDistanceLeft >= 5) {
-      rev();
-      delay(200);
-    }else if (ultraDistanceRight >= 5) {
-        Stop();
-        delay(50);
-        left();
-        delay(800);
-    } else if(ultraDistanceLeft >= 5) {
-        Stop();
-        delay(50);
+       Stop();
+       delay(20);   
+       if (ultraDistanceLeft >= 20) {    //no wall left
+       left();
+      }
+      else {
         right();
-        delay(800);
-    } 
+        delay(50);  //90 degree turn
+    }
   }
   
   
@@ -179,7 +209,6 @@ void maze(int distance) {
   
 
   display.setCursor(0,0);
-  display.println(ultraDistanceRight);
   display.println(ultraDistanceLeft);
   display.display();
   display.clearDisplay();
